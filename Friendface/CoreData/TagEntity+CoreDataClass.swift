@@ -51,7 +51,6 @@ public class TagEntity: NSManagedObject, Decodable {
         }
         self.init(context: context)
         self.name = try decoder.singleValueContainer().decode(String.self)
-        try context.save()
     }
 
 }

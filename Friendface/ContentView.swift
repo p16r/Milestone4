@@ -9,18 +9,12 @@ import SwiftUI
 
 struct ContentView: View {
 
-    @Environment(\.managedObjectContext) static var context
+    @Environment(\.managedObjectContext) var context
     @State var result: Result<[User], Error> = .success([])
 
     private static let url: URL = {
         let string = "https://www.hackingwithswift.com/samples/friendface.json"
         return URL(string: string)!
-    } ()
-    private static let decoder: JSONDecoder = {
-        let decoder = JSONDecoder()
-        decoder.dateDecodingStrategy = .iso8601
-        decoder.userInfo[.managedObjectContext] = context
-        return decoder
     } ()
 
     var body: some View {
@@ -46,12 +40,17 @@ struct ContentView: View {
         URLSession.shared.dataTask(with: Self.url) { data, response, error in
             if let error = error { return result = .failure(error) }
             guard let data = data else { return result = .failure(URLError(.unknown)) }
-            result = Result { try Self.decoder.decode([User].self, from: data) }
-            do {
-                let coreDataDecoded = try Self.decoder.decode([UserEntity].self, from: data)
-                try Self.context.save()
-            } catch {
-                print(error)
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .iso8601
+            decoder.userInfo[.managedObjectContext] = context
+            result = Result { try decoder.decode([User].self, from: data) }
+            context.perform {
+                do {
+                    _ = try decoder.decode([UserEntity].self, from: data)
+                    try context.save()
+                } catch {
+                    print(error)
+                }
             }
         }
         .resume()

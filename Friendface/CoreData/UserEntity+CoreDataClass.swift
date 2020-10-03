@@ -42,7 +42,6 @@ public class UserEntity: NSManagedObject, Decodable {
 
 //        try decodeTags(with: decoder)
 //        try decodeFriends(with: decoder)
-        try context.save()
     }
 
     func decodeTags(with decoder: Decoder) throws {
