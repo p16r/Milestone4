@@ -11,6 +11,7 @@ struct ContentView: View {
 
     @Environment(\.managedObjectContext) var context
     @State var result: Result<[User], Error> = .success([])
+    @FetchRequest(entity: UserEntity.entity(), sortDescriptors: []) var userEntities: FetchedResults<UserEntity>
 
     private static let url: URL = {
         let string = "https://www.hackingwithswift.com/samples/friendface.json"
